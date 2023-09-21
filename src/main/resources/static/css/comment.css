@@ -1,0 +1,76 @@
+/* 상세보기 섹션 스타일링 */
+#detailBoard {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#detailBoard h3 {
+    font-size: 24px;
+    color: #333;
+}
+
+#detailBoard .meta-info {
+    font-size: 14px;
+    color: #777;
+    margin-top: 10px;
+}
+
+#detailBoard .contents {
+    font-size: 16px;
+    color: #444;
+    margin-top: 20px;
+    line-height: 1.6;
+}
+
+/* 댓글 입력 폼 스타일링 */
+#commentForm {
+    margin-top: 20px;
+}
+
+#commentForm textarea.form-control {
+    resize: none; /* 텍스트 영역 크기 조절 비활성화 */
+}
+
+#commentForm button#cWrite {
+    background-color: #007BFF;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+/* 댓글 리스트 스타일링 */
+.comment-item {
+    border: 1px solid #CCCCCC;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.comment-item p:first-child {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.comment-item button {
+    background-color: #DC3545;
+    color: #FFFFFF;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+/* 댓글 섹션 스타일링 */
+#commentList {
+    padding-top: 20px;
+}
+
+#commentCnt {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}

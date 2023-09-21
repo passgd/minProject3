@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kosa.pro7.mappers.BoardDAO">
+
+	<sql id="pagingBefore"> 
+		select  O.* from (
+			select rownum nrow, b.* from (
+	</sql>				
+
+	<sql id="pagingAfter"> 
+			) b 
+			where rownum &lt;= #{endNo}
+		) O
+		where nrow between #{startNo} and #{endNo}
+	</sql>	
+	
+	<select id="getBoardList" resultType="BoardDTO">
+		<include refid="pagingBefore"/>
+		    select 
+		        level, pid, boardid, title, email, reg_date, view_count
+		    from board 
+		    where delete_yn = 'N'
+			<!-- 검색 조건 설정 하는 부분  -->
+	        <if test="searchTitle != null and !searchTitle.isEmpty()">
+	            AND boardid LIKE CONCAT(CONCAT('%', #{searchTitle}), '%')
+	        </if>  
+			start with pid = 0
+			CONNECT BY PRIOR boardid = pid
+			order SIBLINGS by boardid desc
+					 
+		<include refid="pagingAfter"/>
+		
+	</select>
+	
+	<select id="totalCount" resultType="int">
+	    SELECT COUNT(*)
+	    	FROM board
+	</select>
+	
+	<select id="view" resultType="BoardDTO" >
+		select *
+			from board 
+			where boardid = #{boardid}
+	</select>
+	
+	
+	<insert id="insert" >
+		<selectKey keyProperty="boardid" resultType="int"  order="BEFORE">
+			select 
+				seq_board.nextval boardid 
+			from dual
+		</selectKey>
+		INSERT INTO board (
+			  pid
+			, boardid
+			, title
+			, contents
+			, email
+			, reg_date
+		) VALUES (
+			  0
+			, #{boardid}
+			, #{title}
+			, #{contents}
+			, #{email}
+			, sysdate
+		)
+	</insert>
+	
+	<insert id="insertBoardReply" >
+		<selectKey keyProperty="boardid" resultType="int"  order="BEFORE">
+			select 
+				seq_board.nextval boardid 
+			from dual
+		</selectKey>
+		INSERT INTO board (
+			  pid
+			, boardid
+			, title
+			, contents
+			, email
+			, reg_date
+		) VALUES (
+		      #{pid} 
+			, #{boardid}
+			, #{title}
+			, #{contents}
+			, #{email}
+			, sysdate
+		)
+	</insert>
+	
+	<update id="update">
+		update board set 
+			  title = #{title}
+ 			, contents = #{contents} 
+ 			, mod_date = sysdate 
+		where boardid = #{boardid}
+	</update>
+	
+	<delete id="delete">
+		delete from board 
+		where boardid = #{boardid}
+	</delete>
+	
+	<select id="boardTop" resultType="BoardDTO">
+		<![CDATA[
+			select 
+				rownum, sub.*  
+			from (
+				select 
+					* 
+				from board 
+				order by board.boardid desc
+			) sub 
+			where rownum <=5
+		]]>
+	</select>
+	
+	<update id="boardCount">
+		update board set 
+			view_count = view_count + 1 
+		where boardid = #{boardid}
+	</update>
+	
+	<update id="boardDeleteAll">
+
+		update board
+		set delete_yn = 'Y' 
+		where boardid in (
+			select boardid
+			from board
+			start with boardid in (
+		<foreach item="boardid" collection="ids"  separator="," > 
+			#{boardid}		
+		</foreach> 
+		)
+		  connect by prior boardid = pid
+	  )
+	</update>
+	
+	
+	
+	<select id="getboardListBoforeN" parameterType="map">
+		 select * from (
+		     select * 
+		     from board
+			 <![CDATA[
+		     where boardid < #{boardid}  
+		     and delete_yn <> 'Y'
+ 			 ]]> 
+		     order by boardid desc
+		 ) A
+		 <![CDATA[
+ 		 where rownum <= #{N}		 
+ 		 ]]> 
+	</select>
+	
+</mapper>

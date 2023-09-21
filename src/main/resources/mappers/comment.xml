@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kosa.pro7.mappers.CommentDAO">
+
+	<insert id="insertComment" >
+		insert into board_comment(
+			  commentid
+			, boardid
+			, email
+			, contents			
+			, reg_date
+		) values (
+        SEQ_COMMENT.nextval
+        , #{boardid}
+        , #{email, jdbcType=VARCHAR}
+        , #{contents, jdbcType=CLOB}
+        , sysdate
+		) 
+	</insert>
+
+		<select id="commentList" resultType="CommentDTO">
+			select * from (
+				select 
+					commentid, boardid, email, reg_date, contents
+		 			from board_comment 
+		 			<![CDATA[
+				where delete_yn = 'N' and commentid < #{commentid}
+				]]>
+				<if test="commentid != 0">
+					<![CDATA[
+					and boardid = #{boardId}
+					]]>
+				</if>
+				order by commentid desc  
+			) A 
+			<![CDATA[
+			where rownum <= 5
+			]]>
+	</select>
+
+	<select id="totalCount" resultType="int">
+	    SELECT COUNT(*)
+	    	FROM board_comment
+	    	 where boardid = #{boardid}
+	</select>
+
+</mapper>
